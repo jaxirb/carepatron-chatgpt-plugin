@@ -50,7 +50,7 @@ The tools can't receive patient information, because there is no field to put it
 **Hosted (no setup):** in ChatGPT, turn on developer mode (Settings → Security and login, or Settings → Plugins), then at chatgpt.com/plugins choose **Add → Create MCP App**. Enter:
 
 ```
-https://carepatron-chatgpt-plugin.carepatron-chatgpt-plugin.workers.dev/mcp
+https://carepatron-chatgpt-plugin.jacksonirby.workers.dev/mcp
 ```
 
 with **No authentication**. Type `@Carepatron` in a new chat.
