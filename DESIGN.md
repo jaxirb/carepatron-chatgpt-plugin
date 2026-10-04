@@ -1,5 +1,4 @@
 ---
-# gstack: design-md-format=spec
 name: Carepatron Templates (ChatGPT plugin)
 description: Carepatron's editorial marketing voice shrunk to a chat card — warm cream, ink type, one deep purple pill.
 colors:
