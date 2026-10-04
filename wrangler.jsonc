@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "carepatron-chatgpt-plugin",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-10-01",
+  // .html files import as text by default; listed here so the card dependency is explicit.
+  "rules": [{ "type": "Text", "globs": ["**/*.html"], "fallthrough": true }],
+  "observability": { "enabled": true }
+}

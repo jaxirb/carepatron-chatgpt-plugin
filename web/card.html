@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carepatron template</title>
+<!-- Design: DESIGN.md (variant A, brand-native). Fonts are free stand-ins for Carepatron's Copernicus / Helvetica Now. -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400&display=swap">
+<style>
+  :root {
+    --surface: #fafaf3; --text: #0d073b; --muted: rgba(13, 7, 59, .65); --hairline: #ebe6fa;
+    --primary: #5b1db1; --primary-hover: #4a1693; --on-primary: #ffffff;
+  }
+  :root.dark {
+    --surface: #120c33; --text: #f4f1ff; --muted: #b9b2d6; --hairline: #2a2350;
+    --primary: #7242ee; --primary-hover: #8659f2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      --surface: #120c33; --text: #f4f1ff; --muted: #b9b2d6; --hairline: #2a2350;
+      --primary: #7242ee; --primary-hover: #8659f2;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: transparent; }
+  body { font: 14px/1.5 "Instrument Sans", Helvetica, Arial, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+  .card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 16px; padding: 20px 22px 22px; }
+  .card.ready { animation: enter 180ms ease-out; }
+  @keyframes enter { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .card.ready { animation: none; } }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; line-height: 1; }
+  .brand svg { width: 22px; height: 15px; flex: none; }
+  h1 { font: 400 25px/1.15 "Source Serif 4", Georgia, serif; letter-spacing: -.01em; margin: 14px 0 6px; overflow-wrap: anywhere; }
+  .purpose { color: var(--muted); margin: 0; }
+  .meta { color: var(--muted); font-size: 12.5px; margin: 10px 0 0; }
+  .meta b { color: var(--text); font-weight: 600; }
+  ol { list-style: none; margin: 18px 0 20px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; counter-reset: s; }
+  li { counter-increment: s; display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid var(--hairline); }
+  li::before { content: counter(s, decimal-leading-zero); color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; padding-top: 1px; min-width: 18px; }
+  @media (max-width: 420px) { ol { grid-template-columns: 1fr; } }
+  .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 18px; }
+  .primary { background: var(--primary); color: var(--on-primary); border-radius: 9999px; padding: 10px 18px; font-weight: 600; line-height: 1; text-decoration: none; transition: background-color 120ms ease-out; }
+  .primary:hover { background: var(--primary-hover); }
+  .secondary { color: var(--text); font-weight: 500; text-decoration: underline; text-decoration-color: var(--hairline); text-underline-offset: 3px; transition: text-decoration-color 120ms ease-out; }
+  .secondary:hover { text-decoration-color: currentColor; }
+  a:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+  .loading { color: var(--muted); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main id="root">
+  <article class="card">
+    <div class="brand">
+      <svg viewBox="42 69 172 118" aria-hidden="true">
+        <path d="M42 131.438C42 98.1699 68.9694 71.2005 102.238 71.2005H104.896C136.696 71.2005 162.476 96.9799 162.476 128.78C162.476 160.581 136.696 186.36 104.896 186.36H42V131.438Z" fill="#7242EE"/>
+        <path d="M214 113.705C214 89.015 193.985 69 169.295 69H167.5C143.802 69 124.59 88.2114 124.59 111.91C124.59 135.608 143.802 154.82 167.5 154.82H214V113.705Z" fill="#D5C6FA"/>
+        <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd" d="M157.034 153.535C160.524 146.109 162.475 137.818 162.475 129.07C162.475 109.276 152.487 91.8146 137.276 81.451C129.442 89.2253 124.59 100.001 124.59 111.91C124.59 131.998 138.394 148.863 157.034 153.535Z" fill="#AA8EF5"/>
+      </svg>
+      Carepatron
+    </div>
+    <p id="loading" class="loading">Loading template…</p>
+    <div id="content" hidden>
+      <h1 id="title"></h1>
+      <p id="purpose" class="purpose"></p>
+      <p id="meta" class="meta"></p>
+      <ol id="sections"></ol>
+      <div class="actions">
+        <a id="open" class="primary" target="_blank" rel="noopener">Open in Carepatron →</a>
+        <a id="page" class="secondary" target="_blank" rel="noopener">View template page</a>
+      </div>
+    </div>
+  </article>
+</main>
+<script>
+  // Talks to the host two ways: ChatGPT's optional window.openai, and the MCP Apps
+  // postMessage bridge (ui/*). Each capability is feature-detected, never assumed.
+  const LABELS = {
+    psychology_counseling: "Psychology & counseling", physical_therapy: "Physical therapy",
+    occupational_therapy: "Occupational therapy", speech_pathology: "Speech pathology",
+    dietetics: "Dietetics", general_medical: "General medical",
+    progress_note: "Progress note", intake_form: "Intake form", treatment_plan: "Treatment plan",
+    evaluation: "Evaluation", worksheet: "Client worksheet", soap: "SOAP", dap: "DAP", birp: "BIRP",
+  };
+  let bridgeReady = false;
+  let nextId = 1;
+
+  function post(message) { window.parent.postMessage({ jsonrpc: "2.0", ...message }, "*"); }
+
+  // Buttons only ever point at Carepatron over https; anything else hides the button.
+  const ALLOWED_HOSTS = ["app.carepatron.com", "www.carepatron.com"];
+  function safeUrl(value) {
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:" && ALLOWED_HOSTS.includes(url.hostname) ? url.href : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function setLink(id, value) {
+    const link = document.getElementById(id);
+    const url = safeUrl(value);
+    link.hidden = !url;
+    if (url) link.href = url;
+    else link.removeAttribute("href");
+  }
+
+  // Follow ChatGPT's theme when it tells us; otherwise the prefers-color-scheme fallback applies.
+  function applyTheme() {
+    const theme = window.openai && window.openai.theme;
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.classList.toggle("light", theme === "light");
+  }
+
+  // Measure the content, not the document: documentElement.scrollHeight never drops below
+  // the iframe's current height, so the card could grow but never shrink to fit.
+  function notifySize() {
+    const height = Math.ceil(document.getElementById("root").getBoundingClientRect().height);
+    if (window.openai && typeof window.openai.notifyIntrinsicHeight === "function") window.openai.notifyIntrinsicHeight(height);
+    if (bridgeReady) post({ method: "ui/notifications/size-changed", params: { height } });
+  }
+
+  function label(key) { return LABELS[key] || key; }
+
+  function render(data) {
+    if (!data || !data.title || !Array.isArray(data.section_headings)) return;
+    document.getElementById("title").textContent = data.title;
+    document.getElementById("purpose").textContent = data.purpose || "";
+
+    // Meta line: professions in bold, then document type, note format and section count.
+    const meta = document.getElementById("meta");
+    const professions = document.createElement("b");
+    professions.textContent = (data.professions || []).map(label).join(", ");
+    const rest = [data.document_type, data.note_format].filter(Boolean).map(label);
+    rest.push(`${data.section_headings.length} sections`);
+    meta.replaceChildren(professions, ` · ${rest.join(" · ")}`);
+
+    document.getElementById("sections").replaceChildren(...data.section_headings.map((h) => {
+      const li = document.createElement("li");
+      li.textContent = h;
+      return li;
+    }));
+    setLink("open", data.open_in_carepatron_url);
+    setLink("page", data.page_url);
+    document.getElementById("loading").hidden = true;
+    document.getElementById("content").hidden = false;
+    document.querySelector(".card").classList.add("ready");
+    notifySize();
+  }
+
+  function openExternal(event) {
+    const url = safeUrl(event.currentTarget.href);
+    if (!url) {
+      event.preventDefault();
+      return;
+    }
+    if (window.openai && typeof window.openai.openExternal === "function") {
+      event.preventDefault();
+      window.openai.openExternal({ href: url });
+    } else if (bridgeReady) {
+      event.preventDefault();
+      post({ id: nextId++, method: "ui/open-link", params: { url } });
+    }
+    // Otherwise the plain link opens in a new tab.
+  }
+  document.getElementById("open").addEventListener("click", openExternal);
+  document.getElementById("page").addEventListener("click", openExternal);
+
+  window.addEventListener("message", (event) => {
+    if (event.source !== window.parent) return;
+    const msg = event.data;
+    if (!msg || msg.jsonrpc !== "2.0") return;
+    if (msg.id === 0 && msg.result) {
+      bridgeReady = true;
+      post({ method: "ui/notifications/initialized" });
+      notifySize();
+    } else if (msg.method === "ui/notifications/tool-result") {
+      render(msg.params && msg.params.structuredContent);
+    }
+  });
+
+  // ChatGPT fires this when window.openai globals such as toolOutput or theme change.
+  window.addEventListener("openai:set_globals", () => {
+    applyTheme();
+    render(window.openai && window.openai.toolOutput);
+  });
+
+  // Web fonts change line heights once they load; re-measure then.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(notifySize);
+  if (typeof ResizeObserver === "function") new ResizeObserver(notifySize).observe(document.getElementById("root"));
+  applyTheme();
+  if (window.openai && window.openai.toolOutput) render(window.openai.toolOutput);
+  if (window.parent !== window) {
+    post({
+      id: 0,
+      method: "ui/initialize",
+      params: { appInfo: { name: "carepatron-template-card", version: "3.0.0" }, appCapabilities: {}, protocolVersion: "2026-01-26" },
+    });
+  }
+</script>
+</body>
+</html>
