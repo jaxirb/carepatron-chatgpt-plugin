@@ -55,7 +55,7 @@ describe("templates.get", () => {
     expect(getOutput.parse(t)).toEqual(t);
     expect(t.section_headings).toEqual(["Subjective", "Objective", "Assessment", "Plan"]);
     expect(t.open_in_carepatron_url).toBe(
-      "https://app.carepatron.com/Templates?previewTemplateId=e5c6f3e6-0953-4243-996e-810ca8598266",
+      `https://app.carepatron.com/Templates?previewTemplateId=e5c6f3e6-0953-4243-996e-810ca8598266&${UTM}`,
     );
   });
 

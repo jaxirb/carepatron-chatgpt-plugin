@@ -41,6 +41,7 @@ The tools can't receive patient information, because there is no field to put it
 - **No free-text inputs.** A keyword box would match odd requests slightly better, but "can't receive patient data" is a stronger guarantee than "filters patient data".
 - **Stateless server.** Each request gets a fresh server, so a restart never breaks a chat.
 - **Brand-native card.** Built from measurements of carepatron.com: their purple, cream and ink, with free stand-ins for Copernicus and Helvetica Now. See [DESIGN.md](DESIGN.md).
+- **Every link is tagged.** The template page, the PDF and the Open in Carepatron button all carry `utm_source=chatgpt`. The app keeps the tags in place when it opens the template.
 - **Tried and reverted.** I briefly showed the card on every search, plus a closing link under ChatGPT's answer, to push more clicks. Two calls to action in one reply felt pushy, so the card stays a single, clear offer.
 - **Found along the way.** The BIRP template page's Download button links to `birp-notes-template.pdff`, which returns a 404. The file itself lives at `.pdf`.
 

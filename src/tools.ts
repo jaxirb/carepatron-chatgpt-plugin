@@ -116,7 +116,7 @@ export function getTemplate(id: string): TemplateDetail {
   return {
     ...toSummary(t),
     section_headings: t.section_headings,
-    open_in_carepatron_url: openInCarepatronUrl(t),
+    open_in_carepatron_url: withUtm(openInCarepatronUrl(t)),
     pdf_url: withUtm(t.pdf_url),
     last_verified: t.last_verified,
   };
