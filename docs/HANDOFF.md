@@ -1,7 +1,5 @@
 # Handoff: for the Carepatron team
 
-This is yours to keep, change or drop. There are no strings and nothing to sign. Fork it, rename it, own it.
-
 ## What's included
 
 - A working MCP server with two read-only tools and a branded template card. It runs on Node locally or on Cloudflare Workers.
