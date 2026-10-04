@@ -32,6 +32,7 @@ The tools can't receive patient information, because there is no field to put it
 | 15 test prompts in ChatGPT (5 that name Carepatron, 5 that don't, 5 that must not trigger), tool calls checked in the request log | 15/15 |
 | Automated tests (tools, catalog, HTTP transport, restart, malformed requests) | 37 passing |
 | Pre-demo link check (10 template pages, 10 PDFs) | 20/20 live |
+| Hosted on Cloudflare Workers: both tools, the card, rejecting client details, the UTM tags | All passing |
 | Security review | One real issue found and fixed: a malformed path could crash the server. Also: loopback-only binding, a host allowlist, and card links limited to Carepatron domains |
 
 ## Decisions and trade-offs
@@ -48,7 +49,7 @@ The tools can't receive patient information, because there is no field to put it
 **Hosted (no setup):** in ChatGPT, turn on developer mode (Settings → Security and login, or Settings → Plugins), then at chatgpt.com/plugins choose **Add → Create MCP App**. Enter:
 
 ```
-https://carepatron-chatgpt-plugin.HOSTED_SUBDOMAIN.workers.dev/mcp
+https://carepatron-chatgpt-plugin.carepatron-chatgpt-plugin.workers.dev/mcp
 ```
 
 with **No authentication**. Type `@Carepatron` in a new chat.
