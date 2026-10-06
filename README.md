@@ -66,13 +66,6 @@ PUBLIC_HOST=<ngrok-domain> npm run tunnel # second terminal
 npm run deploy                            # publish to Cloudflare Workers
 ```
 
-## What I'd do next
-
-- **Measure it.** Outbound links already carry `utm_source=chatgpt`. Next, tag ChatGPT-sourced signups in product analytics.
-- **Follow through in lifecycle.** A clinician who arrives from a ChatGPT SOAP template should get onboarding that starts from that note, not the generic welcome series.
-- **Test the card.** Compare button copy and the section preview against click-through to the app.
-- **Grow the catalog.** Template pages already carry structured data, so the full library is reachable.
-- **Other assistants.** This is a standard MCP server, so the same code should work in Claude. That's untested so far.
 
 ## Layout
 
