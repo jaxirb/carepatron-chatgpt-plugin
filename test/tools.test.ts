@@ -3,9 +3,11 @@ import { getInput, getOutput, getTemplate, searchInput, searchOutput, searchTemp
 
 describe("templates.search", () => {
   it.each([
-    [{ profession: "speech_pathology" as const }, ["speech-therapy-soap"]],
-    [{ profession: "dietetics" as const }, ["nutrition-assessment"]],
-    [{ document_type: "intake_form" as const }, ["therapy-intake-form"]],
+    [{ profession: "speech_pathology" as const, note_format: "soap" as const }, ["speech-therapy-soap"]],
+    [{ profession: "dietetics" as const, document_type: "evaluation" as const }, ["nutrition-assessment"]],
+    [{ profession: "dietetics" as const, document_type: "intake_form" as const }, ["nutrition-intake-form"]],
+    [{ profession: "physical_therapy" as const, document_type: "intake_form" as const }, ["physical-therapy-intake-form"]],
+    [{ document_type: "cancellation_policy" as const }, ["therapy-cancellation-policy"]],
     [{ document_type: "worksheet" as const }, ["cbt-thought-record"]],
     [{ note_format: "birp" as const }, ["birp-notes"]],
     [{ profession: "psychology_counseling" as const, note_format: "dap" as const }, ["dap-notes"]],
@@ -17,11 +19,11 @@ describe("templates.search", () => {
   });
 
   it("returns no results plus the available pairs when nothing matches (D7)", () => {
-    const r = searchTemplates({ profession: "speech_pathology", document_type: "intake_form" });
+    const r = searchTemplates({ profession: "speech_pathology", document_type: "treatment_plan" });
     expect(r.results).toEqual([]);
     expect(r.available).toContainEqual({ profession: "speech_pathology", document_type: "progress_note" });
     expect(r.available).toContainEqual({ profession: "psychology_counseling", document_type: "intake_form" });
-    expect(r.available).not.toContainEqual({ profession: "speech_pathology", document_type: "intake_form" });
+    expect(r.available).not.toContainEqual({ profession: "speech_pathology", document_type: "treatment_plan" });
   });
 
   it("caps results at the search limit", () => {
@@ -66,6 +68,17 @@ describe("templates.get", () => {
   it("tags outbound site links for attribution", () => {
     const t = getTemplate("dap-notes");
     expect(t.page_url).toBe(`https://www.carepatron.com/templates/dap-notes-template/?${UTM}`);
-    expect(new URL(t.pdf_url).searchParams.get("utm_source")).toBe("chatgpt");
+    expect(new URL(t.pdf_url!).searchParams.get("utm_source")).toBe("chatgpt");
+  });
+
+  it("tells the clinician the next step, and the intake form's next step is to send it to a client", () => {
+    expect(getTemplate("counseling-intake-form").next_step).toMatch(/add your client's email and click Send/);
+    expect(getTemplate("soap-progress-notes").next_step).toMatch(/draft for your next note/);
+  });
+
+  it("omits the PDF link when the template page links the wrong file", () => {
+    const t = getTemplate("therapy-cancellation-policy");
+    expect(t.pdf_url).toBeUndefined();
+    expect(getOutput.parse(t)).toEqual(t);
   });
 });

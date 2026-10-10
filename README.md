@@ -1,8 +1,22 @@
 # Carepatron for ChatGPT
 
-Clinicians already ask ChatGPT for SOAP notes, intake forms and treatment plans. This plugin answers with Carepatron's own template and a button that opens it in their Carepatron workspace.
+Clinicians already ask ChatGPT for SOAP notes, intake forms, consent forms and treatment plans. This plugin answers with Carepatron's own template, the next step to take with it, and a button that opens it in their Carepatron workspace.
+
+**[See it without installing anything →](https://carepatron-chatgpt-plugin.jacksonirby.workers.dev/demo?template=counseling-intake-form)**
 
 ![A Carepatron template card inside ChatGPT](docs/card-in-chatgpt.png)
+
+## Added 11 October 2026, for the Carepatron growth challenge
+
+The server and the card were built the week before. These came out of the challenge's trial data, where practices that got a real client onto the platform in their first 14 days (intake form sent, booking taken, invoice, video call) paid at about three times the rate of those that didn't, and the most common first client touch was an intake form.
+
+- **A landing page and a no-install demo.** [carepatron-chatgpt-plugin.jacksonirby.workers.dev](https://carepatron-chatgpt-plugin.jacksonirby.workers.dev) explains it; `/demo?template=counseling-intake-form` renders the real card in a browser tab, so you can see it without ChatGPT developer mode.
+- **Eight more templates, the new-client pack.** Intake forms for counselling, physio, nutrition and general practice; informed consent, telehealth consent and the AI consent form; a cancellation policy. 18 in total.
+- **A next step on every card.** Intake forms say: open it in Carepatron, add your client's email, send. That is the journey's ask, delivered where the clinician already is.
+- **A third tool, `intake.checklist`.** What a new-client pack should include, by profession group and country (US, AU, NZ, GB, CA), with wording to adapt. The consent item is country-specific, drawn from what the APA, ACA, ASHA, APTA, Ahpra, RACGP, APS, MCNZ, the NZ Psychologists Board, NHS England, BACP and the Ontario IPC publish. It says in every reply that it is not legal advice.
+- Tests went from 37 to 98. About two hours of work.
+
+**Found along the way (two broken links on carepatron.com):** the Therapy Cancellation Policy template page's Download button points at `files/ace-test.pdf`, an unrelated file, so that template ships without a PDF link. The BIRP note page's Download link points at a `.pdff` that 404s (the file is there as `.pdf`).
 
 ## Why
 
@@ -30,8 +44,8 @@ The tools can't receive patient information, because there is no field to put it
 | Check | Result |
 |---|---|
 | 15 test prompts in ChatGPT (5 that name Carepatron, 5 that don't, 5 that must not trigger), tool calls checked in the request log | 15/15 |
-| Automated tests (tools, catalog, HTTP transport, restart, malformed requests) | 37 passing |
-| Pre-demo link check (10 template pages, 10 PDFs) | 20/20 live |
+| Automated tests (tools, catalog, checklist content, HTTP transport, worker routes, restart, malformed requests) | 98 passing |
+| Pre-demo link check (18 template pages, 17 PDFs) | 35/35 live |
 | Hosted on Cloudflare Workers: both tools, the card, rejecting client details, the UTM tags | All passing |
 | Security review | One real issue found and fixed: a malformed path could crash the server. Also: loopback-only binding, a host allowlist, and card links limited to Carepatron domains |
 
@@ -70,12 +84,14 @@ npm run deploy                            # publish to Cloudflare Workers
 ## Layout
 
 ```
-src/catalog.ts   the 10 templates (metadata, section headings and links only)
-src/tools.ts     templates.search and templates.get
+src/catalog.ts   the 18 templates (metadata, section headings and links only)
+src/checklist.ts what a new-client intake pack needs, by profession group and country
+src/tools.ts     templates.search, templates.get and intake.checklist
 src/mcp.ts       MCP server and card resource, shared by both runtimes
 src/server.ts    Node entry (local + ngrok)
-src/worker.ts    Cloudflare Workers entry (hosted)
+src/worker.ts    Cloudflare Workers entry (hosted): /mcp, / and /demo
 web/card.html    the card (no framework, no build step)
+web/index.html   the landing page
 docs/            handoff guide and research notes
 ```
 

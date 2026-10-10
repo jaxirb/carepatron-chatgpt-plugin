@@ -28,10 +28,10 @@ async function connect(port: number): Promise<Client> {
 afterEach(stop);
 
 describe("/mcp over streamable HTTP", () => {
-  it("lists both tools with explicit read-only annotations", async () => {
+  it("lists all three tools with explicit read-only annotations", async () => {
     const client = await connect(await start());
     const { tools } = await client.listTools();
-    expect(tools.map((t) => t.name).sort()).toEqual(["templates.get", "templates.search"]);
+    expect(tools.map((t) => t.name).sort()).toEqual(["intake.checklist", "templates.get", "templates.search"]);
     for (const tool of tools) {
       expect(tool.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false, openWorldHint: false });
       expect(tool.description).toMatch(/^Use this when/);
@@ -45,7 +45,7 @@ describe("/mcp over streamable HTTP", () => {
 
   it("calls search and get end to end", async () => {
     const client = await connect(await start());
-    const search = await client.callTool({ name: "templates.search", arguments: { profession: "speech_pathology" } });
+    const search = await client.callTool({ name: "templates.search", arguments: { profession: "speech_pathology", note_format: "soap" } });
     expect(search.structuredContent).toMatchObject({ results: [{ id: "speech-therapy-soap" }] });
     const get = await client.callTool({ name: "templates.get", arguments: { template_id: "speech-therapy-soap" } });
     expect(get.structuredContent).toMatchObject({ title: "SOAP Notes For Speech Therapy Template" });
@@ -59,6 +59,20 @@ describe("/mcp over streamable HTTP", () => {
       .callTool({ name: "templates.search", arguments: { profession: "physical_therapy", client_name: "Maria Lopez" } })
       .catch((error: Error) => ({ isError: true, error }));
     expect(result.isError).toBe(true);
+    const onChecklist = await client
+      .callTool({ name: "intake.checklist", arguments: { profession_group: "mental_health", country: "AU", client_name: "Maria Lopez" } })
+      .catch((error: Error) => ({ isError: true, error }));
+    expect(onChecklist.isError).toBe(true);
+    await client.close();
+  });
+
+  it("answers the intake checklist with wording and its legal-advice caveat", async () => {
+    const client = await connect(await start());
+    const result = await client.callTool({ name: "intake.checklist", arguments: { profession_group: "mental_health", country: "NZ" } });
+    expect(result.structuredContent).toMatchObject({ country: "NZ", profession_group: "mental_health" });
+    expect(result.content).toEqual([
+      expect.objectContaining({ type: "text", text: expect.stringContaining("not legal advice") }),
+    ]);
     await client.close();
   });
 

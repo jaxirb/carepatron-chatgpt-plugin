@@ -39,6 +39,10 @@
   li { counter-increment: s; display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid var(--hairline); }
   li::before { content: counter(s, decimal-leading-zero); color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; padding-top: 1px; min-width: 18px; }
   @media (max-width: 420px) { ol { grid-template-columns: 1fr; } }
+  .next { margin: 0 0 16px; padding: 12px 14px; border-radius: 10px; background: rgba(91, 29, 177, .06); font-size: 13.5px; }
+  :root.dark .next { background: rgba(114, 66, 238, .14); }
+  @media (prefers-color-scheme: dark) { :root:not(.light) .next { background: rgba(114, 66, 238, .14); } }
+  .next b { font-weight: 600; }
   .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 18px; }
   .primary { background: var(--primary); color: var(--on-primary); border-radius: 9999px; padding: 10px 18px; font-weight: 600; line-height: 1; text-decoration: none; transition: background-color 120ms ease-out; }
   .primary:hover { background: var(--primary-hover); }
@@ -66,6 +70,7 @@
       <p id="purpose" class="purpose"></p>
       <p id="meta" class="meta"></p>
       <ol id="sections"></ol>
+      <p id="next" class="next" hidden><b>Next step:</b> <span id="next-text"></span></p>
       <div class="actions">
         <a id="open" class="primary" target="_blank" rel="noopener">Open in Carepatron →</a>
         <a id="page" class="secondary" target="_blank" rel="noopener">View template page</a>
@@ -81,7 +86,8 @@
     occupational_therapy: "Occupational therapy", speech_pathology: "Speech pathology",
     dietetics: "Dietetics", general_medical: "General medical",
     progress_note: "Progress note", intake_form: "Intake form", treatment_plan: "Treatment plan",
-    evaluation: "Evaluation", worksheet: "Client worksheet", soap: "SOAP", dap: "DAP", birp: "BIRP",
+    evaluation: "Evaluation", worksheet: "Client worksheet", consent_form: "Consent form",
+    cancellation_policy: "Cancellation policy", soap: "SOAP", dap: "DAP", birp: "BIRP",
   };
   let bridgeReady = false;
   let nextId = 1;
@@ -142,6 +148,9 @@
       li.textContent = h;
       return li;
     }));
+    const next = document.getElementById("next");
+    next.hidden = !data.next_step;
+    if (data.next_step) document.getElementById("next-text").textContent = data.next_step;
     setLink("open", data.open_in_carepatron_url);
     setLink("page", data.page_url);
     document.getElementById("loading").hidden = true;
@@ -196,7 +205,7 @@
     post({
       id: 0,
       method: "ui/initialize",
-      params: { appInfo: { name: "carepatron-template-card", version: "3.0.0" }, appCapabilities: {}, protocolVersion: "2026-01-26" },
+      params: { appInfo: { name: "carepatron-template-card", version: "4.0.0" }, appCapabilities: {}, protocolVersion: "2026-01-26" },
     });
   }
 </script>

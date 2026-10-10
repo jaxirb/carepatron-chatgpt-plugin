@@ -19,7 +19,7 @@ async function check(url: string, expectType: string): Promise<string | null> {
 
 const checks = TEMPLATES.flatMap((t) => [
   { id: t.id, url: t.page_url, type: "text/html" },
-  { id: t.id, url: t.pdf_url, type: "application/pdf" },
+  ...(t.pdf_url ? [{ id: t.id, url: t.pdf_url, type: "application/pdf" }] : []),
 ]);
 
 const results = await Promise.all(checks.map(async (c) => ({ ...c, error: await check(c.url, c.type) })));

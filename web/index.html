@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carepatron for ChatGPT</title>
+<meta name="description" content="Clinicians ask ChatGPT for intake forms, consent forms and session notes. This answers with Carepatron's own template and the next step to take with it.">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400&display=swap">
+<style>
+  :root {
+    --surface: #fafaf3; --page: #ffffff; --text: #0d073b; --muted: rgba(13, 7, 59, .65);
+    --hairline: #ebe6fa; --primary: #5b1db1; --primary-hover: #4a1693; --on-primary: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --surface: #1a1446; --page: #120c33; --text: #f4f1ff; --muted: #b9b2d6; --hairline: #2a2350; --primary: #7242ee; --primary-hover: #8659f2; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text); font: 16px/1.6 "Instrument Sans", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { max-width: 680px; margin: 0 auto; padding: 56px 24px 80px; }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; font-size: 14px; }
+  .brand svg { width: 26px; height: 18px; }
+  h1 { font: 400 40px/1.1 "Source Serif 4", Georgia, serif; letter-spacing: -.015em; margin: 28px 0 14px; }
+  h2 { font: 600 15px/1.3 "Instrument Sans", sans-serif; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 44px 0 14px; }
+  p { margin: 0 0 16px; }
+  .lede { font-size: 18px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+  ol, ul { margin: 0 0 16px; padding-left: 22px; }
+  li { margin: 7px 0; }
+  code, .prompt { font-family: ui-monospace, Menlo, monospace; font-size: 14px; }
+  .prompt { display: block; background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 11px 14px; margin: 8px 0; }
+  .btn { display: inline-block; background: var(--primary); color: var(--on-primary); border-radius: 9999px; padding: 12px 22px; font-weight: 600; text-decoration: none; }
+  .btn:hover { background: var(--primary-hover); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--hairline); }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 22px 0 8px; }
+  .note { background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px; padding: 16px 18px; }
+  a { color: var(--primary); }
+  @media (prefers-color-scheme: dark) { a { color: #b79bf7; } }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--hairline); font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">
+    <svg viewBox="42 69 172 118" aria-hidden="true">
+      <path d="M42 131.438C42 98.1699 68.9694 71.2005 102.238 71.2005H104.896C136.696 71.2005 162.476 96.9799 162.476 128.78C162.476 160.581 136.696 186.36 104.896 186.36H42V131.438Z" fill="#7242EE"/>
+      <path d="M214 113.705C214 89.015 193.985 69 169.295 69H167.5C143.802 69 124.59 88.2114 124.59 111.91C124.59 135.608 143.802 154.82 167.5 154.82H214V113.705Z" fill="#D5C6FA"/>
+      <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd" d="M157.034 153.535C160.524 146.109 162.475 137.818 162.475 129.07C162.475 109.276 152.487 91.8146 137.276 81.451C129.442 89.2253 124.59 100.001 124.59 111.91C124.59 131.998 138.394 148.863 157.034 153.535Z" fill="#AA8EF5"/>
+    </svg>
+    Carepatron for ChatGPT
+  </div>
+
+  <h1>Your next new client's paperwork, sorted from a chat.</h1>
+  <p class="lede">A clinician asks ChatGPT for an intake form, a consent form or a cancellation policy. This answers with Carepatron's own template, the sections it covers, and the one thing to do with it next.</p>
+
+  <div class="row">
+    <a class="btn" href="/demo?template=counseling-intake-form">See it without installing anything →</a>
+    <a class="btn ghost" href="https://github.com/jaxirb/carepatron-chatgpt-plugin">Code on GitHub</a>
+  </div>
+  <p class="small muted">An independent prototype, built for Carepatron to take over. Not affiliated with Carepatron or OpenAI.</p>
+
+  <h2>Why this and not another template library</h2>
+  <p>Carepatron already publishes thousands of free templates. The gap is what happens after you find one. In a sample of 552 trial practices, the ones that got a real client onto the platform in the first two weeks (an intake form sent, a booking taken, an invoice, a video call) paid at about three times the rate of the ones that didn't. The most common first step was sending an intake form.</p>
+  <p>So every template here ends with a next step, and intake forms say the same thing: open it, add your client's email, send it. The paperwork is done before the first session.</p>
+
+  <h2>Try these</h2>
+  <span class="prompt">I'm a counsellor and I need an intake form for a new client</span>
+  <span class="prompt">What should I include in a new client pack for a therapy practice in Australia?</span>
+  <span class="prompt">Do I need written consent to use AI notes in New Zealand?</span>
+  <span class="prompt">I need a cancellation policy for my physio practice</span>
+  <span class="prompt">Give me a SOAP note template for speech therapy</span>
+
+  <h2>What it can and can't see</h2>
+  <div class="note">
+    <p><strong>It cannot receive client information, because there is no field to put it in.</strong> Every input is a fixed choice: profession, document type, country. The schemas reject anything else, and a test sends a client name to prove it.</p>
+    <p style="margin:0">Nothing is stored. The server keeps no database and no state between requests. Logs record the tool name and the choices picked, nothing more.</p>
+  </div>
+
+  <h2>Install it in ChatGPT</h2>
+  <p>You need ChatGPT Plus or higher with developer mode on (Settings → Security and login, or Settings → Plugins). Then at <a href="https://chatgpt.com/plugins">chatgpt.com/plugins</a> choose <strong>Add → Create MCP App</strong>, enter this URL with <strong>No authentication</strong>:</p>
+  <span class="prompt">https://carepatron-chatgpt-plugin.jacksonirby.workers.dev/mcp</span>
+  <p>Then type <code>@Carepatron</code> in a new chat.</p>
+
+  <h2>What's inside</h2>
+  <ul>
+    <li><strong>18 Carepatron templates</strong>: intake forms for four professions, informed consent, telehealth consent, AI note-taking consent, a cancellation policy, and the original SOAP, DAP and BIRP notes, treatment plans, evaluations and worksheets.</li>
+    <li><strong>A next step on every card</strong>, so the answer ends in an action rather than a download.</li>
+    <li><strong>An intake pack checklist</strong> by profession and country (US, AU, NZ, GB, CA), with wording to adapt, including what each country's regulators say about consent for AI note-taking. General guidance, not legal advice.</li>
+  </ul>
+
+  <footer>
+    Built by Jackson Irby. The server and the template card were built in early October 2026; the intake, consent and cancellation templates, the next-step line, the checklist and this page were added on 11 October 2026.
+    The Carepatron name, logo and templates belong to Carepatron.
+  </footer>
+</main>
+</body>
+</html>

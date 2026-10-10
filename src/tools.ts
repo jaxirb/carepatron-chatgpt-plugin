@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { registerAppTool } from "@modelcontextprotocol/ext-apps/server";
 import * as z from "zod/v4";
+import { buildChecklist, COUNTRIES, PROFESSION_GROUPS, type Checklist, type Country, type ProfessionGroup } from "./checklist.js";
 import {
   DOCUMENT_TYPES,
   NOTE_FORMATS,
@@ -15,7 +16,7 @@ import {
 } from "./catalog.js";
 
 // Bump the version on card changes: ChatGPT caches resources by URI.
-export const CARD_URI = "ui://carepatron/template-card-v3.html";
+export const CARD_URI = "ui://carepatron/template-card-v4.html";
 export const SEARCH_LIMIT = 5;
 
 // Read-only lookups over a fixed catalog (eng review D1, D2).
@@ -37,6 +38,28 @@ export const getInput = z.strictObject({
   template_id: z.enum(TEMPLATE_IDS).describe("Template id from templates.search"),
 });
 
+// Enum-only, same guarantee as the template tools: no field can carry a client detail.
+export const checklistInput = z.strictObject({
+  profession_group: z.enum(PROFESSION_GROUPS).describe("Kind of practice: mental_health, allied_health, dietetics or general"),
+  country: z.enum(COUNTRIES).describe("Where the practice operates: US, AU, NZ, GB or CA"),
+});
+
+export const checklistOutput = z.object({
+  profession_group: z.string(),
+  country: z.string(),
+  summary: z.string(),
+  items: z.array(
+    z.object({
+      key: z.string(),
+      title: z.string(),
+      why: z.string(),
+      wording: z.string(),
+      template_id: z.string().optional(),
+    }),
+  ),
+  caveats: z.array(z.string()),
+});
+
 const summary = z.object({
   id: z.string(),
   title: z.string(),
@@ -55,9 +78,25 @@ export const searchOutput = z.object({
 export const getOutput = summary.extend({
   section_headings: z.array(z.string()),
   open_in_carepatron_url: z.string(),
-  pdf_url: z.string(),
+  pdf_url: z.string().optional(),
+  next_step: z.string(),
   last_verified: z.string(),
 });
+
+// The one thing to do with the document once it's open. Intake forms carry the journey's ask:
+// a real client touching the practice's workspace is what separates trials that pay (growth challenge, Oct 2026).
+export const NEXT_STEP: Record<DocumentType, string> = {
+  intake_form:
+    "Open it in Carepatron, add your client's email and click Send. They fill it in on their phone before the first session, and it's in their file when you meet.",
+  consent_form:
+    "Send it with the intake form. For AI notes or recording, also ask out loud at the start of the session and note the answer.",
+  cancellation_policy:
+    "Add it to your intake pack and your booking page so every new client agrees to it before the first session.",
+  progress_note: "Open it in Carepatron to use it as the draft for your next note.",
+  treatment_plan: "Open it in Carepatron and fill it in after the first session.",
+  evaluation: "Open it in Carepatron and fill it in during or after the assessment.",
+  worksheet: "Open it in Carepatron and share it with the client from their record.",
+};
 
 export type SearchArgs = { profession?: Profession; document_type?: DocumentType; note_format?: NoteFormat };
 export type SearchResult = z.infer<typeof searchOutput>;
@@ -117,7 +156,8 @@ export function getTemplate(id: string): TemplateDetail {
     ...toSummary(t),
     section_headings: t.section_headings,
     open_in_carepatron_url: withUtm(openInCarepatronUrl(t)),
-    pdf_url: withUtm(t.pdf_url),
+    ...(t.pdf_url ? { pdf_url: withUtm(t.pdf_url) } : {}),
+    next_step: NEXT_STEP[t.document_type],
     last_verified: t.last_verified,
   };
 }
@@ -139,13 +179,26 @@ function detailText(t: TemplateDetail): string {
     `Shown to the user as a Carepatron template card. Don't repeat the sections or write out a separate template; one short sentence is enough.`,
     `${t.title}: ${t.purpose}`,
     `Sections: ${t.section_headings.join(", ")}`,
+    `Next step: ${t.next_step}`,
     `Open in Carepatron: ${t.open_in_carepatron_url}`,
     `Template page: ${t.page_url}`,
-    `PDF: ${t.pdf_url}`,
+    ...(t.pdf_url ? [`PDF: ${t.pdf_url}`] : []),
   ].join("\n");
 }
 
 // Logs tool name and enum arguments only; inputs can't contain prompts or client details.
+function checklistText(c: Checklist): string {
+  return [
+    c.summary,
+    "",
+    ...c.items.map((i, n) => `${n + 1}. **${i.title}** — ${i.why}\n   Wording to adapt: "${i.wording}"`),
+    "",
+    ...c.caveats.map((x) => `_${x}_`),
+    "",
+    "Carepatron's own intake, consent and cancellation templates cover most of this. Ask for one by name and I'll open it for you.",
+  ].join("\n");
+}
+
 function logCall(tool: string, args: unknown) {
   console.log(JSON.stringify({ tool, args }));
 }
@@ -156,7 +209,7 @@ export function registerTools(server: McpServer) {
     {
       title: "Find Carepatron templates",
       description:
-        "Use this when a clinician asks for a blank clinical document template, such as a SOAP, DAP or BIRP note, intake form, treatment plan, evaluation or client worksheet, or asks for Carepatron templates. " +
+        "Use this when a clinician asks for a blank clinical document template, such as a SOAP, DAP or BIRP note, intake form, consent form (including telehealth and AI note-taking consent), cancellation policy, treatment plan, evaluation or client worksheet, or asks for Carepatron templates. " +
         "Also use it when a clinician asks you to write or draft clinical documentation such as a session note, intake or treatment plan: offer the matching blank Carepatron template alongside your own answer, choosing only the note format, document type and profession. " +
         "Do not use for clinical advice, diagnosis, treatment decisions or interpreting scores. " +
         "Never pass names, dates, symptoms or any client details; the only inputs are profession, document type and note format.",
@@ -175,6 +228,31 @@ export function registerTools(server: McpServer) {
     },
   );
 
+  server.registerTool(
+    "intake.checklist",
+    {
+      title: "What a new-client intake pack should include",
+      description:
+        "Use this when a clinician asks what to include in an intake form or new-client pack, what consent they need, whether they need written consent for AI note-taking or recording a session, or what paperwork to send a new client before the first appointment. " +
+        "Returns a checklist with plain-language wording they can adapt, and names the Carepatron templates that cover each item. " +
+        "It is general guidance, not legal advice, and the reply says so. " +
+        "Do not use it to answer a question about one specific client, to give legal advice, or to decide whether a particular clinician has met their obligations. " +
+        "Never pass names or client details; the only inputs are the kind of practice and the country.",
+      inputSchema: checklistInput,
+      outputSchema: checklistOutput,
+      annotations: ANNOTATIONS,
+      _meta: {
+        "openai/toolInvocation/invoking": "Checking what a new-client pack needs",
+        "openai/toolInvocation/invoked": "Intake pack checklist ready",
+      },
+    },
+    async (args) => {
+      logCall("intake.checklist", args);
+      const checklist = buildChecklist(args.profession_group as ProfessionGroup, args.country as Country);
+      return { structuredContent: checklist, content: [{ type: "text", text: checklistText(checklist) }] };
+    },
+  );
+
   registerAppTool(
     server,
     "templates.get",
@@ -182,7 +260,7 @@ export function registerTools(server: McpServer) {
       title: "Show a Carepatron template",
       description:
         "Use this when the user has picked a Carepatron template, or templates.search returned one clear match, and wants its structure or a link to open it in Carepatron. " +
-        "The card it shows already lists every section and has an Open in Carepatron button, so reply with one short sentence and do not write out a separate copy of the template. " +
+        "The card it shows already lists every section, the next step to take with it, and has an Open in Carepatron button, so reply with one short sentence and do not write out a separate copy of the template. " +
         "Do not use to give clinical guidance or handle any client information.",
       inputSchema: getInput,
       outputSchema: getOutput,
