@@ -20,12 +20,18 @@ const HTML = { "content-type": "text/html; charset=utf-8" };
 // injection has to come first. Injecting before </body> leaves the card on "Loading template…".
 function demoPage(templateId: string): string {
   const detail = getTemplate(templateId);
-  const banner = `<div style="font:14px/1.5 system-ui,sans-serif;max-width:620px;margin:28px auto 14px;padding:0 20px;opacity:.72">
-This is the card a clinician sees inside ChatGPT, rendered here so you can look at it without installing anything.
-<a href="/" style="color:inherit">About this plugin</a></div>`;
+  // The card brings its own light and dark styles; the page around it follows the same OS setting.
+  const chrome = `<style>
+    body { background: #fcfcfa; color: #16161a; }
+    @media (prefers-color-scheme: dark) { body { background: #121214; color: #f3f3f1; } }
+    .demo-note { font: 14px/1.5 "Instrument Sans", system-ui, sans-serif; max-width: 620px; margin: 28px auto 14px; padding: 0 20px; opacity: .7; }
+    .demo-note a { color: inherit; }
+  </style>`;
+  const banner = `<div class="demo-note">This is the card a clinician sees inside ChatGPT, rendered here so you can look at it without installing anything. <a href="/">About this plugin</a></div>`;
   const inject = `<script>window.openai = { toolOutput: ${JSON.stringify(detail).replace(/</g, "\\u003c")} };</script>`;
   return cardHtml
-    .replace("<body>", `<body style="background:#f6f5ef">${inject}${banner}<div style="max-width:620px;margin:0 auto;padding:0 20px 40px">`)
+    .replace("</head>", `${chrome}</head>`)
+    .replace("<body>", `<body>${inject}${banner}<div style="max-width:620px;margin:0 auto;padding:0 20px 40px">`)
     .replace("</body>", "</div></body>");
 }
 

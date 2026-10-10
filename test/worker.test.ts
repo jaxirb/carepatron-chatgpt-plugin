@@ -11,6 +11,9 @@ describe("worker routes", () => {
     const body = await res.text();
     expect(body).toContain("/mcp");
     expect(body).toContain("/demo?template=");
+    // Theme toggle: the button and both icon states ship inline, so there's no flash of the wrong theme.
+    expect(body).toContain('id="theme"');
+    expect(body).toContain('data-theme="dark"');
   });
 
   it("renders a template card in a plain browser, no ChatGPT needed", async () => {
