@@ -14,7 +14,7 @@ The server and the card were built the week before. These came out of the challe
 - **Eight more templates, the new-client pack.** Intake forms for counselling, physio, nutrition and general practice; informed consent, telehealth consent and the AI consent form; a cancellation policy. 18 in total.
 - **A next step on every card.** Intake forms say: open it in Carepatron, add your client's email, send. That is the journey's ask, delivered where the clinician already is.
 - **A third tool, `intake.checklist`.** What a new-client pack should include, by profession group and country (US, AU, NZ, GB, CA), with wording to adapt. The consent item is country-specific, drawn from what the APA, ACA, ASHA, APTA, Ahpra, RACGP, APS, MCNZ, the NZ Psychologists Board, NHS England, BACP and the Ontario IPC publish. It says in every reply that it is not legal advice.
-- Tests went from 37 to 98. About two hours of work.
+- Tests went from 37 to 98.
 
 **Found along the way (two broken links on carepatron.com):** the Therapy Cancellation Policy template page's Download button points at `files/ace-test.pdf`, an unrelated file, so that template ships without a PDF link. The BIRP note page's Download link points at a `.pdff` that 404s (the file is there as `.pdf`).
 
