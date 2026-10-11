@@ -27,7 +27,7 @@ function demoPage(templateId: string): string {
     .demo-note { font: 14px/1.5 "Instrument Sans", system-ui, sans-serif; max-width: 620px; margin: 28px auto 14px; padding: 0 20px; opacity: .7; }
     .demo-note a { color: inherit; }
   </style>`;
-  const banner = `<div class="demo-note">This is the card a clinician sees inside ChatGPT, rendered here so you can look at it without installing anything. <a href="/">About this plugin</a></div>`;
+  const banner = `<div class="demo-note">This is the card a clinician sees inside ChatGPT, rendered here so you can look at it without installing anything. <a href="/" target="_blank" rel="noopener">About this plugin</a></div>`;
   const inject = `<script>window.openai = { toolOutput: ${JSON.stringify(detail).replace(/</g, "\\u003c")} };</script>`;
   return cardHtml
     .replace("</head>", `${chrome}</head>`)
